@@ -13,6 +13,19 @@ import javafx.stage.Stage;
  * REPLACE WITH NON-SHOUTING DESCRIPTION OF YOUR APP.
  */
 public class ApiApp extends Application {
+
+    /** The HTTP Client. */
+    public static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+        .version(HttpClient.Version.HTTP_2) // uses HTTP protocol v2
+        .followRedirects(HttpClient.Redirects.NORMAL) // always redirects, except from HTTPS to HTTP
+        .build(); // builds and returns a HttpClient object
+
+    /** Google {@code Gson} object for parsing JSON-formatted strings. */
+    public static Gson GSON = new GsonBuilder()
+        .setPrettyPrintng() // enables pretty printning
+        .create(); // builds and returns Gson object
+
+    /** Instance variables for stage, scene, and root. */
     Stage stage;
     Scene scene;
     VBox root;
