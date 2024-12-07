@@ -17,6 +17,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ScrollPane;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Priority;
+import javafx.scene.text.TextFlow;
+import javafx.scene.text.Text;
 
 
 /**
@@ -52,6 +58,8 @@ public class ApiApp extends Application {
 
     /** The second container contains the scrollPane which displays content. */
     HBox contentLayer;
+    ScrollPane content;
+    TextFlow contentText;
 
     /** The container which stores the different app navigation menus. */
     HBox navigationLayer;
@@ -78,11 +86,12 @@ public class ApiApp extends Application {
         searchTerm.setPromptText("What would you like to cook?");
         getRecipes = new Button("Search!");
         contentLayer = new HBox(4);
+        content = new ScrollPane();
+        contentText = new TextFlow();
         navigationLayer = new HBox(4);
         homeButton = new Button("Home");
         recipeButton = new Button("Recipes");
         exitButton = new Button("Exit");
-
     } // ApiApp
 
 
@@ -90,6 +99,28 @@ public class ApiApp extends Application {
     @Override
     public void init() {
         System.out.println("Executing the init method. ");
+
+        /** Initialization of the expected scene structure. */
+        root.setPadding(new Insets(3)); // sets padding around borders.
+        root.getChildren().addAll(controlLayer, contentLayer, navigationLayer);
+
+        /** Add controlLayer children to scene. */
+        controlLayer.getChildren().addAll(searchTerm, getRecipes);
+
+        /** Add contentLayer children to scene. */
+        contentLayer.getChildren().addAll(content, contentText);
+        contentText.getChildren().add(new Text("Thank you for viewing my app! :D"));
+        content.setContent(contentText);
+
+        /** Add navigationLayer children to scene. */
+        navigationLayer.getChildren().addAll(homeButton, recipeButton, exitButton);
+
+        /** Adjusting components and objects. */
+        HBox.setHgrow(searchTerm, Priority.ALWAYS);
+        HBox.setHgrow(content, Priority.ALWAYS);
+        navigationLayer.setAlignment(Pos.CENTER);
+        VBox.setVgrow(contentLayer, Priority.ALWAYS);
+
 
     } // init
 
@@ -99,17 +130,17 @@ public class ApiApp extends Application {
         System.out.println("Executing the start method. ");
         this.stage = stage;
 
+        /** Excluded code was preset for display purposes. */
         // demonstrate how to load local asset using "file:resources/"
-        Image bannerImage = new Image("file:resources/readme-banner.png");
-        ImageView banner = new ImageView(bannerImage);
-        banner.setPreserveRatio(true);
-        banner.setFitWidth(640);
+        //Image bannerImage = new Image("file:resources/readme-banner.png");
+        //ImageView banner = new ImageView(bannerImage);
+        //banner.setPreserveRatio(true);
+        //banner.setFitWidth(640);
 
         // some labels to display information
-        Label notice = new Label("Modify the starter code to suit your needs.");
+        //Label notice = new Label("Modify the starter code to suit your needs.");
 
         // setup scene
-        root.getChildren().addAll(banner, notice);
         scene = new Scene(root, 360, 640);
 
 
