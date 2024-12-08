@@ -23,6 +23,11 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.TextFlow;
 import javafx.scene.text.Text;
+import java.nio.charset.StandardCharsets;
+import java.net.URLEncoder;
+import java.net.URL;
+import java.net.URI;
+import java.io.IOException;
 
 
 /**
@@ -80,6 +85,11 @@ public class ApiApp extends Application {
         getRecipes.setOnAction(e -> {
                 String searchTermContent = searchTerm.getText();
                 System.out.println(searchTermContent);
+                try {
+                    recipeData(searchTermContent);
+                } catch (IOException | InterruptedException ex) {
+                    System.out.println("There was an error calling the recipeData method.");
+                } // try-catch to handle exceptions when calling the recipeData method.
             });
         homeButton.setOnAction(e -> System.out.println("Home button was clicked."));
         recipeButton.setOnAction(e -> {
@@ -108,13 +118,46 @@ public class ApiApp extends Application {
     /**
      * Sends request to the Recipe Search API to search for food items.
      *
-     *
+     * // find somewhere in the app to param in the textfield to call this method.
      *
      *
      *
      */
-    //public static RecipeSeachResponse recipeData(String ) throws
-    //    IOException, InterruptedException {
+    public static String recipeData(String term) throws
+        IOException, InterruptedException {
+
+        /** Form URI. */
+        String query = String.format(
+            "?type=public&q=%s&app_id=fcfe9a37&app_key=",
+            URLEncoder.encode(term, StandardCharsets.UTF_8)
+        ); // query
+        String uri = RECIPE_API + query + RECIPESEARCHAPI_KEY;
+
+        /** Build the Http Request. */
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(uri))
+            .build();
+
+        /** Send Http Request + Recieve response in form of string. */
+        HttpResponse<String> response = HTTP_CLIENT
+            .send(request, BodyHandlers.ofString());
+
+        /** Test to ensure reques returned good status code. */
+        if (response.statusCode() != 200) {
+            throw new IOException(response.toString());
+        } // if
+
+        /** Parse the JSON response to make it into storable data. */
+
+
+        /** Test to visually isnpect response and ensure request is successful. */
+        System.out.println("Raw Response: ");
+        System.out.println(response.body()); // Prints raw response body
+
+        return response.body(); // returns raw JSON response
+    } // recipeData
+
+
 
 
     /**
