@@ -132,7 +132,7 @@ public class ApiApp extends Application {
 
         /** Excluded code was preset for display purposes. */
         // demonstrate how to load local asset using "file:resources/"
-        //Image bannerImage = new Image("file:resources/readme-banner.png");
+        //Image bannerImage = new Image("file:resources/ApiAppHomePhoto.jpeg");
         //ImageView banner = new ImageView(bannerImage);
         //banner.setPreserveRatio(true);
         //banner.setFitWidth(640);
