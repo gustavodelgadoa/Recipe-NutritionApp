@@ -41,9 +41,11 @@ public class ApiApp extends Application {
         .setPrettyPrinting() // enables pretty printning
         .create(); // builds and returns Gson object
 
-    /** API_KEYS.  */
-    String recipeSearchAPI_KEY = "ba92181528c43589f71bc35246a436c8";
-    String nutritionalAnalysisAPI_KEY = "f1941193cc909c5970e94cedb87ab025";
+    /** API_KEYS and URI's. */
+    public static final String RECIPESEARCHAPI_KEY = "ba92181528c43589f71bc35246a436c8";
+    public static final String NUTRITIONANALYSISAPI_KEY = "f1941193cc909c5970e94cedb87ab025";
+    public static final String RECIPE_API = "https://api.edamam.com/api/recipes/v2";
+    public static final String NUTRITION_API = "https://api.edamam.com/api/nutrition-data";
 
 
     /** Instance variables for stage, scene, and root. */
@@ -66,6 +68,16 @@ public class ApiApp extends Application {
     Button homeButton;
     Button recipeButton;
     Button exitButton;
+
+    /**
+     * Sends request to the Recipe Search API to search for food items.
+     *
+     *
+     *
+     *
+     *
+     */
+    //public static RecipeSeachResponse recipeData()
 
 
 
