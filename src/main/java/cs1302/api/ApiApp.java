@@ -41,7 +41,7 @@ public class ApiApp extends Application {
         .setPrettyPrinting() // enables pretty printning
         .create(); // builds and returns Gson object
 
-    /** API_KEYS and URI's. */
+    /** API_KEYS, and URI's. */
     public static final String RECIPESEARCHAPI_KEY = "ba92181528c43589f71bc35246a436c8";
     public static final String NUTRITIONANALYSISAPI_KEY = "f1941193cc909c5970e94cedb87ab025";
     public static final String RECIPE_API = "https://api.edamam.com/api/recipes/v2";
@@ -63,11 +63,47 @@ public class ApiApp extends Application {
     ScrollPane content;
     TextFlow contentText;
 
+
     /** The container which stores the different app navigation menus. */
     HBox navigationLayer;
     Button homeButton;
     Button recipeButton;
     Button exitButton;
+
+    /** A default image that loads when application starts or when home button is selected. */
+    private static final String CUISINE_IMG = "resources/ApiAppHomePhoto.jpeg";
+
+    /**
+     * Helper method which handles button event handling.
+     */
+    private void buttonHandlers() {
+        getRecipes.setOnAction(e -> {
+                String searchTermContent = searchTerm.getText();
+                System.out.println(searchTermContent);
+            });
+        homeButton.setOnAction(e -> System.out.println("Home button was clicked."));
+        recipeButton.setOnAction(e -> {
+                System.out.println("Recipes button was clicked.");
+                //homePhoto(content); commented out since not functioning.
+            });
+        exitButton.setOnAction(e -> {
+                System.out.println("Exit button was clicked.");
+                System.exit(0);
+            });
+    } // buttonHandlers
+
+    /**
+     * Helper method which sets cuisine photo. currently not functioning.
+     */
+    private void homePhoto(ScrollPane scrollPane) {
+        ImageView imageView = new ImageView("file:" + CUISINE_IMG);
+        imageView.setFitWidth(100);
+        imageView.setFitHeight(100);
+        imageView.setPreserveRatio(true);
+        VBox photoContainer = new VBox(imageView);
+        scrollPane.setContent(photoContainer);
+    } // homePhoto
+
 
     /**
      * Sends request to the Recipe Search API to search for food items.
@@ -77,7 +113,15 @@ public class ApiApp extends Application {
      *
      *
      */
-    //public static RecipeSeachResponse recipeData()
+    //public static RecipeSeachResponse recipeData(String ) throws
+    //    IOException, InterruptedException {
+
+
+    /**
+     * Sends request to the Nutrition analsysis API.
+     *
+     *
+     */
 
 
 
@@ -132,6 +176,8 @@ public class ApiApp extends Application {
         HBox.setHgrow(content, Priority.ALWAYS);
         navigationLayer.setAlignment(Pos.CENTER);
         VBox.setVgrow(contentLayer, Priority.ALWAYS);
+        buttonHandlers();
+        //homePhoto(content); commented out since picture is not loading.
 
 
     } // init
