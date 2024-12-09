@@ -28,6 +28,7 @@ import java.net.URLEncoder;
 import java.net.URL;
 import java.net.URI;
 import java.io.IOException;
+import javafx.scene.control.TextArea;
 
 
 /**
@@ -95,28 +96,12 @@ public class ApiApp extends Application {
         homeButton.setOnAction(e -> System.out.println("Home button was clicked."));
         recipeButton.setOnAction(e -> {
                 System.out.println("Recipes button was clicked.");
-                //displayImage(content); DELETE IF METHOD IS NO LONGER USED.
             });
         exitButton.setOnAction(e -> {
                 System.out.println("Exit button was clicked.");
                 System.exit(0);
             });
     } // buttonHandlers
-
-    /**
-     * Helper method which sets cuisine photo. currently not functioning.
-     */
-    //public void displayImage(ScrollPane scrollPane) {
-    //  ImageView imageView = new ImageView();
-    //  Image image = new Image(recipe.getImage());
-    //  imageView.setImage(image);
-    //  imageView.setFitWidth(200);
-    //  imageView.setPreserveRatio(true);
-    //  VBox photoContainer = new VBox(imageView);
-    //  scrollPane.setContent(photoContainer);
-    // } // homePhoto
-
-
 
     /**
      * Sends request to the Recipe Search API to search for food items.
@@ -163,7 +148,7 @@ public class ApiApp extends Application {
             System.out.println("Recipe Name: " + recipe.getLabel());
             System.out.println("Ingredient list: " + recipe.getIngredientLines());
             //System.out.println("Cuisine Type: " + recipe.getCuisineType());
-            System.out.println("Image URL: " + recipe.getImage());
+            //System.out.println("Image URL: " + recipe.getImage());
             System.out.println("------------------------------------");
             ImageView imageView = new ImageView();
             try {
@@ -173,22 +158,48 @@ public class ApiApp extends Application {
                 System.out.println("Error loading image: " + e.getMessage());
             } // try-catch for image loading onto VBox.
             Label nameLabel = new Label(recipe.getLabel());
-            VBox recipeBox = new VBox(imageView, nameLabel);
-            recipeBox.setAlignment(Pos.CENTER);
+            TextArea ingredientsTextArea = new TextArea(String.join("\n",
+                                                                    recipe.getIngredientLines()));
+            ingredientsTextArea.setWrapText(true);
+            ingredientsTextArea.setEditable(false);
+            ingredientsTextArea.setMaxWidth(200);
+
+            VBox imageAndLabelBox = new VBox(imageView, nameLabel);
+            imageAndLabelBox.setAlignment(Pos.CENTER);
+
+            HBox recipeBox = new HBox(imageAndLabelBox, ingredientsTextArea);
+            recipeBox.setAlignment(Pos.CENTER_LEFT);
+            recipeBox.setSpacing(20);
+
+
             photoContainer.getChildren().add(recipeBox); // exchanged imageView to recipeBox
         } // for
         content.setContent(photoContainer);
         return recipeResponse;
     } // recipeData
 
-
-
-
     /**
      * Sends request to the Nutrition analsysis API.
      *
      *
      */
+    public NutritionResponse nutritionData(List<String> ingredientLines) throws
+        IOException, InterruptedException {
+
+        /** Form URI. */
+
+        /** Build the Http Request. */
+
+        /** Send Http Request + Recieve response in form of string. */
+
+        /** Test to ensure request returned good status code. */
+
+        /** Parse the JSON response to make it into storable data. */
+
+        /** Test to visually inspect response and ensure request is successful. */
+    } // nutritionData
+
+
 
 
 
