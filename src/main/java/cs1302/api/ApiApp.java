@@ -67,6 +67,7 @@ public class ApiApp extends Application {
     HBox contentLayer;
     ScrollPane content;
     TextFlow contentText;
+    VBox photoContainer;
 
 
     /** The container which stores the different app navigation menus. */
@@ -94,7 +95,7 @@ public class ApiApp extends Application {
         homeButton.setOnAction(e -> System.out.println("Home button was clicked."));
         recipeButton.setOnAction(e -> {
                 System.out.println("Recipes button was clicked.");
-                //homePhoto(content); commented out since not functioning.
+                //displayImage(content); DELETE IF METHOD IS NO LONGER USED.
             });
         exitButton.setOnAction(e -> {
                 System.out.println("Exit button was clicked.");
@@ -105,14 +106,16 @@ public class ApiApp extends Application {
     /**
      * Helper method which sets cuisine photo. currently not functioning.
      */
-    private void homePhoto(ScrollPane scrollPane) {
-        ImageView imageView = new ImageView("file:" + CUISINE_IMG);
-        imageView.setFitWidth(100);
-        imageView.setFitHeight(100);
-        imageView.setPreserveRatio(true);
-        VBox photoContainer = new VBox(imageView);
-        scrollPane.setContent(photoContainer);
-    } // homePhoto
+    //public void displayImage(ScrollPane scrollPane) {
+    //  ImageView imageView = new ImageView();
+    //  Image image = new Image(recipe.getImage());
+    //  imageView.setImage(image);
+    //  imageView.setFitWidth(200);
+    //  imageView.setPreserveRatio(true);
+    //  VBox photoContainer = new VBox(imageView);
+    //  scrollPane.setContent(photoContainer);
+    // } // homePhoto
+
 
 
     /**
@@ -123,7 +126,7 @@ public class ApiApp extends Application {
      *
      *
      */
-    public static String recipeData(String term) throws
+    public static RecipeResponse recipeData(String term) throws
         IOException, InterruptedException {
 
         /** Form URI. */
@@ -148,13 +151,34 @@ public class ApiApp extends Application {
         } // if
 
         /** Parse the JSON response to make it into storable data. */
-
+        RecipeResponse recipeResponse = GSON.fromJson(response.body(), RecipeResponse.class);
+        System.out.println("Parsed Recipes: " + recipeResponse.getHits().size());
 
         /** Test to visually isnpect response and ensure request is successful. */
-        System.out.println("Raw Response: ");
-        System.out.println(response.body()); // Prints raw response body
-
-        return response.body(); // returns raw JSON response
+        //System.out.println("Raw Response: ");
+        //System.out.println(response.body()); // Prints raw response body
+        //return response.body(); // returns raw JSON response
+        for (Hit hit : recipeResponse.getHits()) {
+            Recipe recipe = hit.getRecipe();
+            System.out.println("Recipe Name: " + recipe.getLabel());
+            System.out.println("Ingredient list: " + recipe.getIngredientLines());
+            //System.out.println("Cuisine Type: " + recipe.getCuisineType());
+            System.out.println("Image URL: " + recipe.getImage());
+            System.out.println("------------------------------------");
+            ImageView imageView = new ImageView();
+            try {
+                Image image = new Image(recipe.getImage(), 200, 0, true, true);
+                imageView.setImage(image);
+            } catch (Exception e) {
+                System.out.println("Error loading image: " + e.getMessage());
+            } // try-catch for image loading onto VBox.
+            Label nameLabel = new Label(recipe.getLabel());
+            VBox recipeBox = new VBox(imageView, nameLabel);
+            recipeBox.setAlignment(Pos.CENTER);
+            photoContainer.getChildren().add(imageView);
+        } // for
+        content.setContent(photoContainer);
+        return recipeResponse;
     } // recipeData
 
 
@@ -187,6 +211,8 @@ public class ApiApp extends Application {
         contentLayer = new HBox(4);
         content = new ScrollPane();
         contentText = new TextFlow();
+        photoContainer = new VBox();
+        photoContainer.setSpacing(10);
         navigationLayer = new HBox(4);
         homeButton = new Button("Home");
         recipeButton = new Button("Recipes");
