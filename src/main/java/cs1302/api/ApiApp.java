@@ -122,11 +122,11 @@ public class ApiApp extends Application {
      * Sends request to the Recipe Search API to search for food items.
      *
      * // find somewhere in the app to param in the textfield to call this method.
-     *
+     * // deleted "static" in method declaration. Testing before changing call in button handle.
      *
      *
      */
-    public static RecipeResponse recipeData(String term) throws
+    public RecipeResponse recipeData(String term) throws
         IOException, InterruptedException {
 
         /** Form URI. */
@@ -175,7 +175,7 @@ public class ApiApp extends Application {
             Label nameLabel = new Label(recipe.getLabel());
             VBox recipeBox = new VBox(imageView, nameLabel);
             recipeBox.setAlignment(Pos.CENTER);
-            photoContainer.getChildren().add(imageView);
+            photoContainer.getChildren().add(recipeBox); // exchanged imageView to recipeBox
         } // for
         content.setContent(photoContainer);
         return recipeResponse;
