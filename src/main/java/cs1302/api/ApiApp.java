@@ -31,6 +31,7 @@ import java.io.IOException;
 import javafx.scene.control.TextArea;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 
 /**
@@ -143,9 +144,6 @@ public class ApiApp extends Application {
         System.out.println("Parsed Recipes: " + recipeResponse.getHits().size());
 
         /** Test to visually isnpect response and ensure request is successful. */
-        //System.out.println("Raw Response: ");
-        //System.out.println(response.body()); // Prints raw response body
-        //return response.body(); // returns raw JSON response
         for (Hit hit : recipeResponse.getHits()) {
             Recipe recipe = hit.getRecipe();
             System.out.println("Recipe Name: " + recipe.getLabel());
@@ -183,10 +181,7 @@ public class ApiApp extends Application {
             HBox recipeBox = new HBox(imageAndLabelBox, ingredientsTextArea, nutritionalTextArea);
             recipeBox.setAlignment(Pos.CENTER_LEFT);
             recipeBox.setSpacing(20);
-
-
             photoContainer.getChildren().add(recipeBox); // exchanged imageView to recipeBox
-            //nutritionData(recipe.getIngredientLines()); PLACED HIGHER SO IN RIGHT PLACE
         } // for
         content.setContent(photoContainer);
         return recipeResponse;
@@ -228,20 +223,9 @@ public class ApiApp extends Application {
             throw new IOException(response.toString());
         } // if
 
-        // used to test raw JSON response
-        //System.out.println("Raw JSON nutrition response: ");
-        //System.out.println(response.body());
-
         /** Parse the JSON response to make it into storable data. */
         NutritionResponse nutritionResponse = GSON.fromJson(response.body(),
                                                             NutritionResponse.class);
-        System.out.println("Parsed Nutrition: \n Total Calories: "
-                           + nutritionResponse.getCalories()
-                           + "\n Total Fat: " + nutritionResponse.getTotalNutrients().get("FAT").
-                           getQuantity()
-                           + "g");
-
-        /** Test to visually inspect response and ensure request is successful. */
         return nutritionResponse;
     } // nutritionData
 
@@ -253,6 +237,32 @@ public class ApiApp extends Application {
         List<String> nutritionInfo = new ArrayList<>();
         nutritionInfo.add("Calories: " + nutritionResponse.getCalories());
         nutritionInfo.add("Total Weight: " + nutritionResponse.getTotalWeight() + "g");
+        nutritionInfo.add("CO2 Emissions: " + nutritionResponse.getTotalCO2Emissions());
+        nutritionInfo.add("\nTotal Nutrients: ");
+        if (nutritionResponse.getTotalNutrients() != null) {
+            for (Map.Entry<String, NutritionResponse.Nutrient> entry : nutritionResponse
+                     .getTotalNutrients().entrySet()) {
+                NutritionResponse.Nutrient nutrient = entry.getValue();
+                nutritionInfo.add(String.format("%s: %.2f %s", nutrient.getLabel(),
+                                                nutrient.getQuantity(),
+                                                nutrient.getUnit()));
+            }
+        } else {
+            nutritionInfo.add("No nutrient data available.");
+        } // if-else
+
+        nutritionInfo.add("\nTotal DailyValues: ");
+        if (nutritionResponse.getTotalDaily() != null) {
+            for (Map.Entry<String, NutritionResponse.Nutrient> entry : nutritionResponse
+                     .getTotalDaily().entrySet()) {
+                NutritionResponse.Nutrient nutrient = entry.getValue();
+                nutritionInfo.add(String.format("%s: %.2f ", nutrient.getLabel(),
+                                                nutrient.getQuantity()));
+            }
+        } else {
+            nutritionInfo.add("No daily value data available.");
+        } // if-else
+
         return nutritionInfo;
     } // formattedNutritionResponse
 
@@ -302,7 +312,17 @@ public class ApiApp extends Application {
 
         /** Add contentLayer children to scene. */
         contentLayer.getChildren().addAll(content, contentText);
-        contentText.getChildren().add(new Text("Thank you for viewing my app! :D"));
+        contentText.getChildren().add(new Text("Thank you for viewing my app! :D"
+                                               + "\n \nThe following is an Application that uses"
+                                      + "\ntwo Edamam API's. The first, Recipe Search API returns"
+                                      + "\nrecipes based on the search term you provide. "
+                                      + "\nIt returns the image of the dish, in addition it"
+                                      + "\nprovides the list of ingredients for each recipe."
+                                      + "\n \nThe second, Nutritional Analysis API returns "
+                                      + "\nmore detailed nutritional facts not provided by"
+                                      + "\nthe Recipe Search API. It provides Calories,"
+                                      + "\nTotal Weight, CO2 Emissions, Total Nutrients,"
+                                      + "\nTotal Daily Values, and much more!"));
         content.setContent(contentText);
 
         /** Add navigationLayer children to scene. */
