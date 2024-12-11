@@ -7,12 +7,12 @@ Markdown is transformed into nice-looking HTML.
 
 ## Part 1.1: App Description
 
-> Please provide a friendly description of your app, including
-> the primary functions available to users of the app. Be sure to
-> describe exactly what APIs you are using and how they are connected
-> in a meaningful way.
-
-> **Also, include the GitHub `https` URL to your repository.**
+> This app allows users to search for recipes by querying the Edamam Recipe Search API.
+> Users can view recipe information including images, recipe labels,  and ingredient lists.
+> The app integrates with the Edamam Nutrition Analysis API to provide a comprehensive breakdown
+> of the nutritional content for the ingredients in each recipe. The two API's are connected
+> to enrich the recipe details with dynamic nutritional analysis.
+> https://github.com/gustavodelgadoa/cs1302-api-app
 
 TODO WRITE / REPLACE
 
@@ -28,29 +28,27 @@ TODO WRITE / REPLACE
 ### API 1
 
 ```
-https://.../replace/me
+https://api.edamam.com/search?q=chicken&app_id=fcfe9a37&app_key=ba92181528c43589f71bc35246a436c8
 ```
 
-> Replace this line with notes (if needed) or remove it (if not needed).
+> Rate Limit: 10 calls per minute
 
 ### API 2
 
 ```
-https://../replace/me
+https://api.edamam.com/api/nutrition-data?app_id=f4bdac2c&app_key=f1941193cc909c5970e94cedb87ab025&nutrition-type=cooking&ingr=1%20chicken%20breast
 ```
 
-> Replace this line with notes (if needed) or remove it (if not needed).
+> Rate Limit: 20 calls per minute
 
 ## Part 2: New
 
-> What is something new and/or exciting that you learned from working
-> on this project?
-
-TODO WRITE / REPLACE
+> One exciting aspect of building this application was learning how to combine data from miltiple
+> API's to create a seamless User Experience. Understanding how to handle API rate limits was very
+> exciting as well.
 
 ## Part 3: Retrospect
 
-> If you could start the project over from scratch, what do
-> you think might do differently and why?
-
-TODO WRITE / REPLACE
+> I would first design the App's architecture to better account for API limitations.
+> Planning these constraints I could have streamlined the logic in the application for handling
+> errors and delays.
