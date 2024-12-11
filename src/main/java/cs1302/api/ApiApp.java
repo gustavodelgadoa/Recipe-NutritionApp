@@ -32,10 +32,17 @@ import javafx.scene.control.TextArea;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import javafx.scene.control.Alert;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
 
 
 /**
- * REPLACE WITH NON-SHOUTING DESCRIPTION OF YOUR APP.
+ * This class handles the main application logic for the ApiApp.
+ * It communicates with two external API's to fetch recipe and nutritional data.
+ * This application provides a UI where users can search for recipes and view
+ * relevant information such as ingredients, nutritional details, and images.
  */
 public class ApiApp extends Application {
 
@@ -83,41 +90,70 @@ public class ApiApp extends Application {
     /** A default image that loads when application starts or when home button is selected. */
     private static final String CUISINE_IMG = "resources/ApiAppHomePhoto.jpeg";
 
+    /** Private boolean which keeps track whether user can make API calls. */
+    private boolean rateLimitTracker = true;
+
+    /**
+     * Helper method that builds and displays any relevant alerts to the user.
+     *
+     * @param message The string which is taken as a param when method is called and displays on UI.
+     */
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Rate Limit Reached");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    } // showAlert
+
     /**
      * Helper method which handles button event handling.
      */
     private void buttonHandlers() {
         getRecipes.setOnAction(e -> {
+            photoContainer.getChildren().clear(); // clears all results from previous search
+            if (rateLimitTracker) {
                 String searchTermContent = searchTerm.getText();
                 System.out.println(searchTermContent);
+                rateLimitTracker = false;
+                getRecipes.setDisable(true); // disables button
                 try {
                     recipeData(searchTermContent);
-                    //nutritionData(recipe.getIngredientLines()); DELETE IF CALL DOESNT WORK
+                    showAlert("You have reached the API rate limit. Please wait atleast 60 "
+                              + "seconds before searching again.");
+                    new Timeline(new KeyFrame(Duration.seconds(60), f -> {
+                        getRecipes.setDisable(false);
+                        rateLimitTracker = true;
+                    })).play();
                 } catch (IOException | InterruptedException ex) {
                     System.out.println("There was an error calling the recipeData method.");
                 } // try-catch to handle exceptions when calling the recipeData method.
-            });
+            } else {
+                System.out.println("Somethings wrong with the button. ");
+            } // if-else
+        });
         homeButton.setOnAction(e -> System.out.println("Home button was clicked."));
         recipeButton.setOnAction(e -> {
-                System.out.println("Recipes button was clicked.");
-            });
+            System.out.println("Recipes button was clicked.");
+        });
         exitButton.setOnAction(e -> {
-                System.out.println("Exit button was clicked.");
-                System.exit(0);
-            });
+            System.out.println("Exit button was clicked.");
+            System.exit(0);
+        });
     } // buttonHandlers
 
     /**
-     * Sends request to the Recipe Search API to search for food items.
+     * Fetches the recipe data for a search term provided by user using the Recipe Search API.
+     * Constructs query with provided search term and sends an HTTP request to retrieve
+     * images, name of cuisine, and an ingredient list. Response is then parsed and returned
+     * as a RecipeResponse object.
      *
-     * // find somewhere in the app to param in the textfield to call this method.
-     * // deleted "static" in method declaration. Testing before changing call in button handle.
-     *
-     *
+     * @param term The search term used to request recipes containing the term.
+     * @return RecipeResponse object containing image, recipe name, and ingredient list data.
+     * @throws IOException if an I/O error occurs during request.
+     * @throws InterruptedException if thread is interrupted while awaiting response.
      */
-    public RecipeResponse recipeData(String term) throws
-        IOException, InterruptedException {
-
+    public RecipeResponse recipeData(String term) throws IOException, InterruptedException {
         /** Form URI. */
         String query = String.format(
             "?type=public&q=%s&app_id=fcfe9a37&app_key=",
@@ -134,24 +170,16 @@ public class ApiApp extends Application {
         HttpResponse<String> response = HTTP_CLIENT
             .send(request, BodyHandlers.ofString());
 
-        /** Test to ensure reques returned good status code. */
+        /** Test to ensure request returned good status code. */
         if (response.statusCode() != 200) {
             throw new IOException(response.toString());
         } // if
 
-        /** Parse the JSON response to make it into storable data. */
+        /** Parse the JSON response and handles objects + formats objects for scene. */
         RecipeResponse recipeResponse = GSON.fromJson(response.body(), RecipeResponse.class);
         System.out.println("Parsed Recipes: " + recipeResponse.getHits().size());
-
-        /** Test to visually isnpect response and ensure request is successful. */
         for (Hit hit : recipeResponse.getHits()) {
             Recipe recipe = hit.getRecipe();
-            System.out.println("Recipe Name: " + recipe.getLabel());
-            System.out.println("Ingredient list: " + recipe.getIngredientLines());
-            //System.out.println("Cuisine Type: " + recipe.getCuisineType());
-            //System.out.println("Image URL: " + recipe.getImage());
-            nutritionData(recipe.getIngredientLines());
-            System.out.println("------------------------------------");
             ImageView imageView = new ImageView();
             try {
                 Image image = new Image(recipe.getImage(), 200, 0, true, true);
@@ -170,14 +198,12 @@ public class ApiApp extends Application {
             TextArea nutritionalTextArea;
             nutritionalTextArea = new TextArea(String.join("\n",
                                 formattedNutritionResponse(nutritionResponse)));
-
             nutritionalTextArea.setWrapText(true);
             nutritionalTextArea.setEditable(false);
             nutritionalTextArea.setMaxWidth(200);
 
             VBox imageAndLabelBox = new VBox(imageView, nameLabel);
             imageAndLabelBox.setAlignment(Pos.CENTER);
-
             HBox recipeBox = new HBox(imageAndLabelBox, ingredientsTextArea, nutritionalTextArea);
             recipeBox.setAlignment(Pos.CENTER_LEFT);
             recipeBox.setSpacing(20);
@@ -188,9 +214,15 @@ public class ApiApp extends Application {
     } // recipeData
 
     /**
-     * Sends request to the Nutrition analsysis API.
+     * Fetches the nutritional data for a list of ingredients using the Nutritional Analysis API.
+     * Constructs query with provided ingredient list and sends an HTTP request to retrieve
+     * the nutritional information. Response is then parsed and returned as a NutritionResponse
+     * object.
      *
-     *
+     * @param ingredientLines The list of ingredients in the recipe.
+     * @return NutritionResponse object containing nutritional data for ingredients.
+     * @throws IOException if an I/O error occurs during request.
+     * @throws InterruptedException if thread is interrupted while awaiting response.
      */
     public NutritionResponse nutritionData(List<String> ingredientLines) throws
         IOException, InterruptedException {
@@ -230,8 +262,12 @@ public class ApiApp extends Application {
     } // nutritionData
 
     /**
+     * Formats the nutritional response data into a list of strings suitable for displaying
+     * in the UI. This method extracts key nutritional information such as calories, total
+     * nutrients, daily values. It formats them into a list of strings for display.
      *
-     *
+     * @param nutritionResponse The NutritionResponse object containing the nutritional data.
+     * @return A list of strings representing the formatted nutritional data.
      */
     private List<String> formattedNutritionResponse(NutritionResponse nutritionResponse) {
         List<String> nutritionInfo = new ArrayList<>();
@@ -265,10 +301,6 @@ public class ApiApp extends Application {
 
         return nutritionInfo;
     } // formattedNutritionResponse
-
-
-
-
 
     /**
      * Constructs an {@code ApiApp} object. This default (i.e., no argument)
@@ -356,12 +388,14 @@ public class ApiApp extends Application {
         //Label notice = new Label("Modify the starter code to suit your needs.");
 
         // setup scene
-        scene = new Scene(root, 360, 640);
+        scene = new Scene(root, 1000, 710);
 
 
         // setup stage
         stage.setTitle("ApiApp!");
         stage.setScene(scene);
+        stage.setMaxWidth(1280);
+        stage.setMaxHeight(720);
         stage.setOnCloseRequest(event -> Platform.exit());
         stage.sizeToScene();
         stage.show();
