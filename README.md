@@ -1,3 +1,12 @@
+## Application Description
+
+This app allows users to search for recipes by querying the Edamam Recipe Search API.
+Users can view recipe information including images, recipe labels,  and ingredient lists.
+The app integrates with the Edamam Nutrition Analysis API to provide a comprehensive breakdown
+of the nutritional content for the ingredients in each recipe. The two API's are connected
+to enrich the recipe details with dynamic nutritional analysis.
+https://github.com/gustavodelgadoa/cs1302-api-app
+
 ## Project Description
 
 Your goal is to implement, from scratch, an application in Java 17 using
