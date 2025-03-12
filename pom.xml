@@ -23,14 +23,15 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <gson.version>2.10.1</gson.version>
-    <openjfx.version>17.0.10</openjfx.version>
+    <openjfx.version>21</openjfx.version>
+    <javafx.runtime.path>${settings.localRepository}/org/openjfx</javafx.runtime.path>
     <!-- general settings -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <teamlist.showAvatarImages>false</teamlist.showAvatarImages>
     <exec.addResourcesToClasspath>true</exec.addResourcesToClasspath>
     <exec.cleanupDaemonThreads>false</exec.cleanupDaemonThreads>
     <!-- project settings -->
-    <exec.mainClass>cs1302uga.api/cs1302.api.ApiDriver</exec.mainClass>
+    <exec.mainClass>cs1302.api.ApiDriver</exec.mainClass>
     <cs1302.project.description>https://github.com/cs1302uga/${project.name}</cs1302.project.description>
     <cs1302.webwork.url>https://webwork.cs.uga.edu/~${env.USER}/${project.name}</cs1302.webwork.url>
     <cs1302.webwork.path>file:/home/myid/${env.USER}/public_html/${project.name}</cs1302.webwork.path>
@@ -72,6 +73,16 @@
   </licenses>
 
   <dependencies>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
@@ -180,20 +191,15 @@
       </plugins>
     </pluginManagement>
     <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <configuration>
-            <executable>java</executable>
-            <arguments>
-              <argument>-Dprism.order=sw</argument>
-              <argument>--module-path</argument> <!-- or -p  -->
-              <modulepath/>
-              <argument>--module</argument> <!-- or -m -->
-              <argument>${exec.mainClass}</argument>
-            </arguments>
-          </configuration>
-        </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <mainClass>${exec.mainClass}</mainClass>
+          <classpathScope>runtime</classpathScope>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
